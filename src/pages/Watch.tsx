@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Download, Server, RefreshCw, AlertCircle, ArrowLeft, Play, Film, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Server, RefreshCw, AlertCircle, ArrowLeft, Play, Film, ExternalLink } from "lucide-react";
 import { settings } from "../lib/settings";
 import { EpisodePayload, SamehadakuQualityItem, SamehadakuServerItem } from "../types";
 
@@ -355,25 +355,16 @@ export default function Watch({ currentHash, onNavigate }: WatchProps) {
               </div>
             )}
 
-            {/* Action buttons (Download link redirect) */}
+            {/* Action button: open original stream in new tab */}
             <div id="watch-action-buttons" className="flex items-center gap-3 pt-2">
-              <button
-                onClick={() => onNavigate(`#/download/${slug}`)}
-                className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-[#1e1f2e] border border-[#2a2b3d]/50 hover:bg-[#252637] hover:border-[#2a2b3d] text-white text-xs font-bold rounded-xl cursor-pointer transition-colors shadow-sm"
-              >
-                <Download size={14} />
-                Unduh Episode Ini
-              </button>
-              
-              {/* External source safety trigger */}
               <a
                 href={streamUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="flex-none p-3 bg-[#1e1f2e] border border-[#2a2b3d]/50 hover:text-white text-[#8b8c9e] rounded-xl cursor-pointer transition-colors"
-                title="Buka di tab baru"
+                className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-[#1e1f2e] border border-[#2a2b3d]/50 hover:bg-[#252637] hover:border-[#2a2b3d] text-white text-xs font-bold rounded-xl cursor-pointer transition-colors shadow-sm"
               >
                 <ExternalLink size={14} />
+                Buka di Tab Baru
               </a>
             </div>
 

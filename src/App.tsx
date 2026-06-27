@@ -8,7 +8,6 @@ import Explore from "./pages/Explore";
 import Schedule from "./pages/Schedule";
 import Detail from "./pages/Detail";
 import Watch from "./pages/Watch";
-import Download from "./pages/Download";
 import Settings from "./pages/Settings";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -77,9 +76,9 @@ export default function App() {
     if (hash.startsWith("#/watch")) {
       return <Watch currentHash={hash} onNavigate={handleNavigate} />;
     }
-    if (hash.startsWith("#/download")) {
-      return <Download currentHash={hash} onNavigate={handleNavigate} />;
-    }
+    // NOTE: Halaman Download dinonaktifkan sementara — API anime saat ini
+    // belum punya endpoint link download per kualitas (masih dummy/placeholder).
+    // File src/pages/Download.tsx dibiarkan ada untuk diaktifkan kembali nanti.
 
     // Default to Home
     return <Home onNavigate={handleNavigate} />;
