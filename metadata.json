@@ -1,0 +1,6 @@
+{
+  "name": "Aniplay",
+  "description": "Platform streaming anime premium dengan visual memukau, performa kencang, dan layout responsif.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
