@@ -93,8 +93,8 @@ export default function DesktopSidebar({ currentHash, onNavigate }: DesktopSideb
 
       {/* Footer Info */}
       <div id="sidebar-footer" className="text-xs text-[#4a4b5e] mt-auto border-t border-[#2a2b3d]/50 pt-4">
-        <p className="font-semibold text-[#8b8c9e] mb-1">Aniplay v2.0</p>
-        <p>© 2026 Aniplay</p>
+        <p className="font-semibold text-[#8b8c9e] mb-1">Toonora v2.0</p>
+        <p>© 2026 Toonora</p>
       </div>
     </div>
   );

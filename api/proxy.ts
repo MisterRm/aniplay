@@ -24,17 +24,6 @@ function supabaseHeaders() {
   };
 }
 
-async function getBlacklistedSlugs(): Promise<Set<string>> {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/blacklisted_anime?select=anime_slug`, { headers: supabaseHeaders() });
-    const data = (await res.json()) as { anime_slug: string }[];
-    return new Set(data.map((i) => (i.anime_slug || "").toLowerCase().trim()));
-  } catch (err) {
-    console.error("Error fetching blacklist:", err);
-    return new Set();
-  }
-}
-
 function normalizeAnimasu(item: any) {
   if (!item) return null;
   return {
@@ -67,10 +56,6 @@ function normalizeSamehadaku(item: any) {
   };
 }
 
-function filterBlacklist(list: any[], blacklist: Set<string>) {
-  return list.filter((item) => item && !blacklist.has((item.slug || "").toLowerCase()));
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -91,9 +76,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (route === "featured_anime") {
       const r = await fetch(`${SUPABASE_URL}/rest/v1/featured_anime?select=*&order=order_index.asc`, { headers: supabaseHeaders() });
       const data = await r.json();
-      const blacklist = await getBlacklistedSlugs();
       setCache(res, CACHE_ONEHOUR);
-      return res.json(data.filter((i: any) => !blacklist.has((i.anime_slug || "").toLowerCase())));
+      return res.json(data);
     }
 
     if (route === "announcements") {
@@ -103,7 +87,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (route === "home") {
-      const blacklist = await getBlacklistedSlugs();
       if (isV2) {
         const [rR, rO] = await Promise.all([
           fetch(`${ANIME_BASE_URL}samehadaku/recent?page=1`),
@@ -113,16 +96,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const dO = await rO.json();
         setCache(res, CACHE_ONEHOUR);
         return res.json({
-          recent: filterBlacklist((dR.data?.animeList || []).map(normalizeSamehadaku), blacklist),
-          ongoing: filterBlacklist((dO.data?.animeList || []).map(normalizeSamehadaku), blacklist)
+          recent: (dR.data?.animeList || []).map(normalizeSamehadaku),
+          ongoing: (dO.data?.animeList || []).map(normalizeSamehadaku)
         });
       } else {
         const r = await fetch(`${ANIME_BASE_URL}animasu/home?apikey=${ANIME_API_KEY}`);
         const d = await r.json();
         setCache(res, CACHE_ONEHOUR);
         return res.json({
-          ongoing: filterBlacklist((d.ongoing || []).map(normalizeAnimasu), blacklist),
-          recent: filterBlacklist((d.recent || []).map(normalizeAnimasu), blacklist)
+          ongoing: (d.ongoing || []).map(normalizeAnimasu),
+          recent: (d.recent || []).map(normalizeAnimasu)
         });
       }
     }
@@ -131,13 +114,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const keyword = encodeURIComponent(params.keyword || "");
       const page = params.page || "1";
       if (!keyword) return res.json({ animes: [] });
-      const blacklist = await getBlacklistedSlugs();
       if (isV2) {
         const r = await fetch(`${ANIME_BASE_URL}samehadaku/search?q=${keyword}&page=${page}`);
         const d = await r.json();
         setCache(res, CACHE_ONEHOUR);
         return res.json({
-          animes: filterBlacklist((d.data?.animeList || []).map(normalizeSamehadaku), blacklist),
+          animes: (d.data?.animeList || []).map(normalizeSamehadaku),
           pagination: {
             hasNext: !!d.pagination?.hasNextPage,
             hasPrev: !!d.pagination?.hasPrevPage,
@@ -149,7 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const d = await r.json();
         setCache(res, CACHE_ONEHOUR);
         return res.json({
-          animes: filterBlacklist((d.animes || []).map(normalizeAnimasu), blacklist),
+          animes: (d.animes || []).map(normalizeAnimasu),
           pagination: { hasNext: false, hasPrev: false, currentPage: 1 }
         });
       }
@@ -159,14 +141,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const tab = params.tab || "Ongoing";
       const genreSlug = params.genreSlug || "";
       const page = params.page || "1";
-      const blacklist = await getBlacklistedSlugs();
       if (isV2) {
         const epMap: Record<string, string> = { Popular: "popular", Movies: "movies", Completed: "completed", Latest: "recent", Genres: `genres/${genreSlug}` };
         const r = await fetch(`${ANIME_BASE_URL}samehadaku/${epMap[tab] || "ongoing"}?page=${page}`);
         const d = await r.json();
         setCache(res, CACHE_ONEHOUR);
         return res.json({
-          animes: filterBlacklist((d.data?.animeList || []).map(normalizeSamehadaku), blacklist),
+          animes: (d.data?.animeList || []).map(normalizeSamehadaku),
           pagination: {
             hasNext: !!d.pagination?.hasNextPage,
             hasPrev: !!d.pagination?.hasPrevPage,
@@ -179,7 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const d = await r.json();
         setCache(res, CACHE_ONEHOUR);
         return res.json({
-          animes: filterBlacklist((d.animes || []).map(normalizeAnimasu), blacklist),
+          animes: (d.animes || []).map(normalizeAnimasu),
           pagination: {
             hasNext: !!d.pagination?.hasNext,
             hasPrev: !!d.pagination?.hasPrev,
@@ -204,12 +185,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (route === "schedule") {
-      const blacklist = await getBlacklistedSlugs();
       if (isV2) {
         const r = await fetch(`${ANIME_BASE_URL}samehadaku/schedule`);
         const d = await r.json();
         const result: Record<string, any[]> = {};
-        for (const day of d.data?.days || []) result[day.day.toLowerCase()] = filterBlacklist((day.animeList || []).map(normalizeSamehadaku), blacklist);
+        for (const day of d.data?.days || []) result[day.day.toLowerCase()] = (day.animeList || []).map(normalizeSamehadaku);
         setCache(res, CACHE_ONEHOUR);
         return res.json(result);
       } else {
@@ -217,7 +197,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const d = await r.json();
         const sched = d.schedule || {};
         const result: Record<string, any[]> = {};
-        for (const day of ["minggu", "senin", "selasa", "rabu", "kamis", "jum'at", "sabtu"]) result[day] = filterBlacklist((sched[day] || []).map(normalizeAnimasu), blacklist);
+        for (const day of ["minggu", "senin", "selasa", "rabu", "kamis", "jum'at", "sabtu"]) result[day] = (sched[day] || []).map(normalizeAnimasu);
         setCache(res, CACHE_ONEHOUR);
         return res.json(result);
       }
@@ -226,8 +206,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (route === "detail") {
       const slug = params.slug || "";
       if (!slug) return res.status(400).json({ error: "slug diperlukan" });
-      const blacklist = await getBlacklistedSlugs();
-      if (blacklist.has(slug.toLowerCase())) return res.status(403).json({ error: "Anime ini telah diblokir di web. Silakan dapatkan fitur lengkap di aplikasi Android.", blacklisted: true });
       if (isV2) {
         const r = await fetch(`${ANIME_BASE_URL}samehadaku/anime/${slug}`);
         const d = (await r.json()).data || {};

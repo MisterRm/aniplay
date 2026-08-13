@@ -347,9 +347,9 @@ export default function Settings({ onNavigate }: SettingsProps) {
       <div id="settings-section-about" className="bg-[#1e1f2e] border border-[#2a2b3d]/45 p-4 rounded-2xl flex flex-col gap-3 shadow-sm text-xs text-[#8b8c9e] leading-relaxed">
         <h2 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 pb-2.5 border-b border-[#2a2b3d]/40">
           <Info size={14} className={getAccentTextClass()} />
-          Tentang Aniplay
+          Tentang Toonora
         </h2>
-        <p className="font-bold text-white">Aniplay Streaming Premium v2.0</p>
+        <p className="font-bold text-white">Toonora Streaming Premium v2.0</p>
         <p>Aplikasi streaming anime modern, responsive, dan premium yang dirancang khusus untuk pengalaman menonton terbaik. Didukung oleh proxy serverless berkecepatan tinggi.</p>
         <p className="border-t border-[#2a2b3d]/30 pt-2 text-[10px] text-[#4a4b5e] mt-1 font-mono">
           Made with Love in React + Tailwind CSS by AI Assistant.

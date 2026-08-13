@@ -1,4 +1,4 @@
-# Aniplay
+# Toonora
 
 Aplikasi streaming anime (React + Vite + Tailwind v4), siap deploy ke Vercel.
 
