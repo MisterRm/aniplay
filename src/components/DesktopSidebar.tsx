@@ -67,7 +67,7 @@ export default function DesktopSidebar({ currentHash, onNavigate }: DesktopSideb
           <Play size={18} fill="white" className="ml-0.5" />
         </div>
         <span className="text-xl font-bold text-white tracking-wider font-sans">
-          Ani<span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">play</span>
+          Toon<span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">ora</span>
         </span>
       </div>
 

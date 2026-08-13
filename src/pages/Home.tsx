@@ -212,7 +212,7 @@ export default function Home({ onNavigate }: HomeProps) {
             <Play size={14} fill="white" className="ml-0.5" />
           </div>
           <span className="text-lg font-extrabold tracking-wider text-white">
-            Ani<span className="text-secondary text-sm font-normal">play</span>
+            Toon<span className="text-secondary text-sm font-normal">ora</span>
           </span>
         </div>
         <button 
